@@ -20,7 +20,7 @@ library(readr)
 #Stakeholders : Cyclistic Executive Team
 
 
-
+#link to original data set : https://divvy-tripdata.s3.amazonaws.com/index.html/Divvy_Trips_2020_Q1
 ## Import data set using readr package and store data set in variable
 bike_Data1 <- read_csv("/Users/selinnaescabi/Desktop/Cyclistic Bike-Share Dataset/Divvy_Trips_2020_Q1.csv")
 
