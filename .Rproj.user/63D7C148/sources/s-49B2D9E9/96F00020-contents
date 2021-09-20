@@ -24,7 +24,7 @@ library(readr)
 ## Import data set using readr package and store data set in variable
 bike_Data1 <- read_csv("/Users/selinnaescabi/Desktop/Cyclistic Bike-Share Dataset/Divvy_Trips_2020_Q1.csv")
 
-
+write.csv(bike_data_2020_q1, "bike_data_2020_q1.csv")
 #data is organized by individual ride, no identifier for individual riders which will make it impossible to identify outliers that may skew results of analysis.
 
 #Credibility: seeing as this is financial data directly from a company. I would consider this credible data.
