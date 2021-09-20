@@ -89,15 +89,20 @@ ggplot(data = average_Diffs) +
 
 #use barchart to visually display different days of use faceted by members and casual riders
 
+
 ggplot(data = bike_data_with_ride_length) +
   geom_bar(mapping = aes(x = dayOfRide)) +
+  
   facet_wrap(~member_casual)
+  
+bike_data_2020_q1 %>%
+  ggplot(aes(x = dayOfRide)) +geom_bar() + facet_wrap(~member_casual)
   
 
 
 
 
-
+casual_members
 
 
 

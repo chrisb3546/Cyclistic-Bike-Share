@@ -1,0 +1,128 @@
+---
+title: "Cyclist Bike-Share Markdown"
+author: "Chris Brady"
+date: "9/20/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This project was built to explore a dataset for a fictional ride share company called Cyclistic.
+
+This analysis will attempt to find any notable differences between different user groups and make reccomendations to the marketing team on how to convert casual users into annual members.
+
+First the environment was set up and the dataset was downloaded from  https://divvy-tripdata.s3.amazonaws.com/index.html/Divvy_Trips_2020_Q1.
+Then, imported into Rstudio
+
+```{r}
+
+library(lubridate)
+library(tidyverse)
+library(readr)
+bike_Data1 <- read_csv("/Users/selinnaescabi/Desktop/Cyclistic Bike-Share Dataset/Divvy_Trips_2020_Q1.csv")
+
+```
+
+Once the data was imported, it was transformed to include columns that tracked the length of individual rides in seconds, and what day of the week the ride was started on.
+
+```{r}
+bike_data_with_ride_length <- bike_Data1 %>%
+  mutate(time_of_ride = bike_Data1$ended_at - bike_Data1$started_at )
+
+add_weekday <- bike_data_with_ride_length %>%
+  mutate(dayOfRide = wday(started_at, label= TRUE))
+
+#update data set to have weekday column
+bike_data_with_ride_length <- add_weekday
+
+bike_data_with_ride_length
+```
+
+Some columns in this newly transformed data set have a negative number for time of ride. The data was then filtered to make sure it only contained valid ride times.
+
+```{r}
+corrected_ride_length <- bike_data_with_ride_length %>%
+  filter(time_of_ride >= 0)
+
+#set back original variable name for cleaned data
+bike_data_with_ride_length <- corrected_ride_length
+```
+Now that the data is properly cleaned and transformed, I implememted the ggplot2 package to display the first visualization that will compare the ride lengths between the casual members and annual members.
+
+```{r}
+ggplot(data = bike_data_with_ride_length) +
+  
+  geom_point(mapping = aes(x = time_of_ride, y = member_casual, color = member_casual))
+
+```
+Based on this visual, it appears that the casual members ride time tends to be longer than the annual members ride time.
+
+To investigate this further, I created two small data frames from the original cleaned dataset.
+One dataframe contains the median ride length for both the casual and annual members, and the other contains the average ride length for both memberships.
+
+
+```{r}
+
+members <-bike_data_with_ride_length%>%
+  filter(member_casual == "member")
+
+casual_members <- bike_data_with_ride_length %>%
+  filter(member_casual == "casual")
+#create data frame that contains observations for median ride length for casuals and members respectively
+casual_members
+
+
+median_Diffs <- data.frame("Median_Ride_Time" = c(median(casual_members$time_of_ride), 
+                                                     median(members$time_of_ride)),
+                              member_casual = c("casual", "member"))
+
+#create data frame that contains observations for average ride length for casuals and members respectively
+
+average_Diffs <- data.frame("Average_Ride_Time" = c(mean(casual_members$time_of_ride), 
+                                                   mean(members$time_of_ride)),
+                            member_casual = c("casual", "member"))
+```
+From these two data frames, bar charts are used to visualize the difference in ride length between both memberships:
+
+```{r}
+ggplot(data = median_Diffs) + 
+  geom_bar(mapping = aes(x = member_casual, y = Median_Ride_Time), stat = 'identity')
+
+ggplot(data = average_Diffs) + 
+  geom_bar(mapping = aes(x = member_casual, y = Average_Ride_Time), stat = 'identity')
+```
+
+
+
+
+
+
+Both of these charts clearly show a significant difference in ride length between the memberships. The casual member on average tends to have much longer ride lengths than the annual rider.
+
+Next, the riders for each day of the week were examined to see if there were notable differences in when a rider of a certain membership would use the service.
+
+
+```{r}
+bike_data_with_ride_length %>%
+  ggplot(aes(x = dayOfRide)) +geom_bar() + facet_wrap(~member_casual)
+  
+
+```
+
+
+Based on the bar charts above, it appears that casual riders tend to ride more on weekends, and annual members tend to ride more during the week.
+
+
+
+
+Conclusion.
+
+This analysis was tasked with identifying the differences between bicycle riders who have an annual membership vs. a casual membership (a day pass).
+
+From this data, it looks like annual members are utilizing their membership for shorter rides during time periods where most people work, and casual members are utilizing the service for long rides on weekends. While it may be worth surveying riders to see how they view their use of the service, I don't think it is unreasonable to conclude that annual members may view their membership as an all-purpose transportation method while casuals view it for more leisurely activities.
